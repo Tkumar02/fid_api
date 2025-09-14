@@ -13,12 +13,21 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.chrome.service import Service
+from fastapi.middleware.cors import CORSMiddleware
 from webdriver_manager.chrome import ChromeDriverManager
 import chromedriver_autoinstaller
 
 chromedriver_autoinstaller.install()
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200", "https://your-angular-app-url.com"],  # add your Angular URL later
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class SearchRequest(BaseModel):
     search_term: str
