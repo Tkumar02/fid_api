@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+selenium
+webdriver-manager
+chromedriver-autoinstaller
+pydantic
+
+
+
