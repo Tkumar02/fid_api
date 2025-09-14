@@ -42,14 +42,27 @@ async def scrape(request: ScrapeRequest):
     soup = BeautifulSoup(response.content, 'html.parser')
 
     # Try to extract price
-    price_elem = soup.find('h3', class_='detail_value text-grey-800 mb-8 no-wrap')
-    invest_name = soup.find('h1', class_="mb-8 h3 detail__name")
+    price_fidelity = soup.find('h3', class_='detail_value text-grey-800 mb-8 no-wrap')
+    fidelity_name = soup.find('h1', class_="mb-8 h3 detail__name")
 
-    if price_elem:
-        price = price_elem.text.strip()
-        name = invest_name.text.strip()
-    else:
-        price = None
+    price_markets = soup.find('span', class_='mod-ui-data-list__value')
+    markets_name = soup.find('h1', class_='mod-tearsheet-overview__header__name mod-tearsheet-overview__header__name--small')
+
+    #<span class="mod-ui-data-list__value">1.81</span>
+    #<h1 class="mod-tearsheet-overview__header__name mod-tearsheet-overview__header__name--small">Santander GO Global Equity RKP GBP Acc</h1>
+
+    if 'fidelity' in url:
+        if price_fidelity:
+            price = price_fidelity.text.strip()
+            name = fidelity_name.text.strip()
+        else:
+            price = None
+    if 'markets.ft.com' in url:
+        if price_markets:
+            price=price_markets.text.strip()
+            name = markets_name.text.strip()
+        else:
+            price = None
 
     return {"price": price,"name":name, "url": url}
 
