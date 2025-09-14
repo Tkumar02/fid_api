@@ -12,7 +12,7 @@ class URLRequest(BaseModel):
 @app.post("/scrape")
 def scrape_fidelity(request: URLRequest):
     url = request.url
-    result = {"price": None, "url": url, "error": None}
+    result = {"price": None,"name": None, "url": url, "error": None}
 
     try:
         print(f"Fetching URL: {url}")
@@ -21,9 +21,12 @@ def scrape_fidelity(request: URLRequest):
 
         soup = BeautifulSoup(response.content, 'html.parser')
         price_elem = soup.find('h3', class_='detail_value text-grey-800 mb-8 no-wrap')
+        invest_name = soup.find('h1', class_="mb-8 h3 detail__name")
 
+#<h1 class="mb-8 h3 detail__name">Tesla Inc (TSLA)</h1>
         if price_elem:
             result["price"] = price_elem.text.strip()
+            result["name"] = invest_name.text.strip()
             print(f"Price found: {result['price']}")
         else:
             result["error"] = "Price element not found."
