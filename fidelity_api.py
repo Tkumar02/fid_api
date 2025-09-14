@@ -12,8 +12,8 @@ app = FastAPI()
 
 # --- CORS setup ---
 origins = [
-    "http://localhost:4200",  # Angular dev server
-    "https://your-angular-domain.com",  # Optional: deployed frontend
+    "http://localhost:4200/edit-fund",  # Angular dev server
+    "https://projsept-e73a6.web.app/edit-fund",  # Optional: deployed frontend
 ]
 
 app.add_middleware(
@@ -50,7 +50,7 @@ async def scrape(request: ScrapeRequest):
     else:
         price = None
 
-    return {"price": price,"name":invest_name, "url": url}
+    return {"price": price,"name":name, "url": url}
 
 
 # # file: fidelity_api_bs4.py
