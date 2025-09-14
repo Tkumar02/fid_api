@@ -12,8 +12,9 @@ app = FastAPI()
 
 # --- CORS setup ---
 origins = [
-    "http://localhost:4200/edit-fund",  # Angular dev server
-    "https://projsept-e73a6.web.app/edit-fund",  # Optional: deployed frontend
+    "*"
+    # "http://localhost:4200",  # Angular dev server
+    # "https://projsept-e73a6.web.app",  # Optional: deployed frontend
 ]
 
 app.add_middleware(
