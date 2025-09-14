@@ -1,27 +1,18 @@
-# Use Selenium’s Chrome + Chromedriver base image
-FROM selenium/standalone-chrome:latest
-
-# Switch to root to install Python
-USER root
-
-# Install Python + pip
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Use a lightweight Python image
+FROM python:3.12-slim
 
 # Set working directory
 WORKDIR /app
 
-# Copy your application code and requirements
-COPY fidelity_api.py requirements.txt ./
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install dependencies
-RUN pip3 install --no-cache-dir -r requirements.txt
+# Copy app code
+COPY fidelity_api.py .
 
-# Expose port (only if your app runs as a web service)
-EXPOSE 8080
+# Expose the port Render expects
+ENV PORT=10000
 
-# Run your script
-CMD ["python3", "fidelity_api.py"]
+# Command to run the FastAPI app
+CMD ["uvicorn", "fidelity_api:app", "--host", "0.0.0.0", "--port", "10000"]
