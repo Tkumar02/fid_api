@@ -31,7 +31,7 @@ class ScrapeRequest(BaseModel):
 
 # --- API endpoint ---
 @app.post("/scrape")
-async def scrape(request: ScrapeRequest):
+def scrape(request: ScrapeRequest):
     url = request.url
     try:
         response = requests.get(url, timeout=10)
@@ -47,9 +47,9 @@ async def scrape(request: ScrapeRequest):
 
     price_markets = soup.find('span', class_='mod-ui-data-list__value')
     markets_name = soup.find('h1', class_='mod-tearsheet-overview__header__name mod-tearsheet-overview__header__name--small')
+    markets_currency = soup.find('span', class_='mod-ui-data-list__label')
 
-    #<span class="mod-ui-data-list__value">1.81</span>
-    #<h1 class="mod-tearsheet-overview__header__name mod-tearsheet-overview__header__name--small">Santander GO Global Equity RKP GBP Acc</h1>
+    #<span class="mod-ui-data-list__label" data-toggle="tooltipster">Price (GBX)</span>
 
     if 'fidelity' in url:
         if price_fidelity:
@@ -61,10 +61,20 @@ async def scrape(request: ScrapeRequest):
         if price_markets:
             price=price_markets.text.strip()
             name = markets_name.text.strip()
+            if markets_currency.contains('GBX'):
+                currency = 'p'
+            else:
+                currency = '£'
         else:
             price = None
-
-    return {"price": price,"name":name, "url": url}
+    if currency == 'p':
+        final= {"currency":currency, "price": price,"name":name, "url": url}
+    elif currency =="£":
+        final= {"price": price,"currency":currency,"name":name, "url": url}
+    else:
+        final= {"price": price, "name":name, "url": url}
+    
+    return final
 
 
 # # file: fidelity_api_bs4.py
