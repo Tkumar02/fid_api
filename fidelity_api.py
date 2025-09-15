@@ -41,38 +41,51 @@ def scrape(request: ScrapeRequest):
 
     soup = BeautifulSoup(response.content, 'html.parser')
 
+    final = {"price": None, "name": None, "url": url}
+
     # Try to extract price
     price_fidelity = soup.find('h3', class_='detail_value text-grey-800 mb-8 no-wrap')
     fidelity_name = soup.find('h1', class_="mb-8 h3 detail__name")
 
     price_markets = soup.find('span', class_='mod-ui-data-list__value')
     markets_name = soup.find('h1', class_='mod-tearsheet-overview__header__name mod-tearsheet-overview__header__name--small')
-    markets_currency = soup.find('span', class_='mod-ui-data-list__label')
+    
+    price_label = soup.find('span', class_='mod-ui-data-list__label', string=lambda s: s and "Price" in s)
+    
+    currency_text = price_label.get_text(strip=True) if price_label else '';
 
-    #<span class="mod-ui-data-list__label" data-toggle="tooltipster">Price (GBX)</span>
 
     if 'fidelity' in url:
-        if price_fidelity:
-            price = price_fidelity.text.strip()
-            name = fidelity_name.text.strip()
-        else:
-            price = None
-    if 'markets.ft.com' in url:
-        if price_markets:
-            price=price_markets.text.strip()
+        if price_fidelity and fidelity_name:
+            final.update({
+                "price": price_fidelity.text.strip(),
+                "name": fidelity_name.text.strip()
+            })
+
+    elif 'markets.ft.com' in url:
+        if price_markets and markets_name:
+            price = price_markets.text.strip()
             name = markets_name.text.strip()
-            if markets_currency and 'GBX' in markets_currency.text:
-                currency = 'p'
+
+            if currency_text and 'GBX' in currency_text:
+                mcurrency = 'p'
             else:
-                currency = '£'
-        else:
-            price = None
-    if currency and currency == 'p':
-        final= {"currency":currency, "price": price,"name":name, "url": url}
-    elif currency and currency =="£":
-        final= {"price": price,"currency":currency,"name":name, "url": url}
-    else:
-        final= {"price": price, "name":name, "url": url}
+                mcurrency = '£'
+
+            final.update({
+                "price": price,
+                "name": name,
+                "currency": mcurrency,
+                "text": currency_text
+            })
+
+    
+    # if mcurrency and mcurrency == 'p':
+    #     final= {"currency":mcurrency, "price": price,"name":name, "url": url,'text':currency}
+    # elif mcurrency and mcurrency =="£":
+    #     final= {"price": price,"currency":mcurrency,"name":name, "url": url,'text':currency}
+    # else:
+    #     final= {"price": price, "name":name, "url": url}
     
     return final
 
