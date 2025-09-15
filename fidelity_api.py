@@ -12,14 +12,14 @@ app = FastAPI()
 
 # --- CORS setup ---
 origins = [
-    "*"
     # "http://localhost:4200",  # Angular dev server
     # "https://projsept-e73a6.web.app",  # Optional: deployed frontend
+    # "http://127.0.0.1:4200"
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # can use ["*"] during testing
+    allow_origins=['*'],  # can use ["*"] during testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -61,15 +61,15 @@ def scrape(request: ScrapeRequest):
         if price_markets:
             price=price_markets.text.strip()
             name = markets_name.text.strip()
-            if markets_currency.contains('GBX'):
+            if markets_currency and 'GBX' in markets_currency.text:
                 currency = 'p'
             else:
                 currency = '£'
         else:
             price = None
-    if currency == 'p':
+    if currency and currency == 'p':
         final= {"currency":currency, "price": price,"name":name, "url": url}
-    elif currency =="£":
+    elif currency and currency =="£":
         final= {"price": price,"currency":currency,"name":name, "url": url}
     else:
         final= {"price": price, "name":name, "url": url}
